@@ -2,7 +2,7 @@ import { useMemo, useState } from "react";
 import PlusIcon from "../icons/PlusIcon.tsx";
 import type { Column, Id, Task } from "../types";
 import ColumnContainer from "./ColumnContainer.tsx";
-import { DndContext, DragOverlay, PointerSensor, useSensor, useSensors, type DragEndEvent, type DragStartEvent } from "@dnd-kit/core";
+import { DndContext, DragOverlay, PointerSensor, useSensor, useSensors, type DragEndEvent, type DragOverEvent, type DragStartEvent } from "@dnd-kit/core";
 import { arrayMove, SortableContext } from "@dnd-kit/sortable";
 import { createPortal } from "react-dom";
 import TaskCard from "./TaskCard.tsx";
@@ -35,7 +35,8 @@ const KanbanBoard = () => {
 
   return (
     <div className="m-auto flex min-h-screen w-full items-center overflow-x-auto overflow-y-hidden px-10">
-      <DndContext sensors={sensors} onDragStart={onDragStart} onDragEnd={onDragEnd}>
+
+      <DndContext sensors={sensors} onDragStart={onDragStart} onDragEnd={onDragEnd} onDragOver={onDragOver}>
         <div className="m-auto flex gap-4">
           <div className="flex gap-4">
             <SortableContext items={columnsId}>
@@ -131,25 +132,53 @@ const KanbanBoard = () => {
   }
 
   function onDragEnd(event: DragEndEvent) {
+    setActiveColumn(null);
+    setActiveTask(null);
+
     const {active, over} = event;
     if(!over) return;
 
-    const activeColumnId = active.id;
-    const overColumnId = over.id;
+    const activeId = active.id;
+    const overId = over.id;
 
-    if(activeColumnId === overColumnId) return;
+    if(activeId === overId) return;
 
     setColumns((columns) => {
       const activeColumnIndex = columns.findIndex(
-        (column) => column.id === activeColumnId
+        (column) => column.id === activeId
       );
 
       const overColumnIndex = columns.findIndex(
-        (column) => column.id === overColumnId
+        (column) => column.id === overId
       );
 
       return arrayMove(columns, activeColumnIndex, overColumnIndex);
     })
+  }
+
+  function onDragOver(event: DragOverEvent) {
+    const {active, over} = event;
+    if(!over) return;
+
+    const activeId = active.id;
+    const overId = over.id;
+
+    if(activeId === overId) return;
+
+    const isActiveTask = active.data.current?.type === "Task"
+    const isOverTask = over.data.current?.type === "Task"
+
+    // Dropping Task over other Task
+    if(isActiveTask && isOverTask) {
+      setTasks((tasks) => {
+        const activeIndex = tasks.findIndex(t => t.id === activeId);
+        const overIndex = tasks.findIndex(t => t.id === overId);
+
+        return arrayMove(tasks, activeIndex, overIndex);
+      })
+    }
+
+    // Dropping Task over Column
   }
 
   function createTask(columnId:Id){

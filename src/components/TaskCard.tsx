@@ -75,7 +75,7 @@ const TaskCard = ({task, deleteTask, updateTask}:Props) => {
         placeholder='Task Content Here'
         onBlur={toggleEditMode}
         onKeyDown={(e) => {
-          if(e.key === "Enter" && e.shiftKey) toggleEditMode();
+          if((e.key === "Enter" && e.shiftKey) || e.key === "Escape") toggleEditMode();
         }}
         onChange={(e) => updateTask(task.id, e.target.value)}>
         </textarea>
