@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 import type { Id, Task } from '../types';
 import TrashIcon from '../icons/TrashIcon';
 import { useSortable } from '@dnd-kit/sortable';
