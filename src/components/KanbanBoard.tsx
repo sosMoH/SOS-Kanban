@@ -165,8 +165,10 @@ const KanbanBoard = () => {
 
     if(activeId === overId) return;
 
-    const isActiveTask = active.data.current?.type === "Task"
-    const isOverTask = over.data.current?.type === "Task"
+    const isActiveTask = active.data.current?.type === "Task";
+    const isOverTask = over.data.current?.type === "Task";
+
+    if(!isActiveTask) return;
 
     // Dropping Task over other Task
     if(isActiveTask && isOverTask) {
@@ -174,11 +176,24 @@ const KanbanBoard = () => {
         const activeIndex = tasks.findIndex(t => t.id === activeId);
         const overIndex = tasks.findIndex(t => t.id === overId);
 
+        tasks[activeIndex].columnId = tasks[overIndex].columnId;
+
         return arrayMove(tasks, activeIndex, overIndex);
       })
     }
 
     // Dropping Task over Column
+    const isOverColumn = over.data.current?.type === "Column";
+
+    if(isActiveTask && isOverColumn) {
+      setTasks((tasks) => {
+        const activeIndex = tasks.findIndex(t => t.id === activeId);
+
+        tasks[activeIndex].columnId = overId;
+
+        return arrayMove(tasks, activeIndex, activeIndex);
+      })
+    }
   }
 
   function createTask(columnId:Id){
