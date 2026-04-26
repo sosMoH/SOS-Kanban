@@ -5,6 +5,7 @@ import ColumnContainer from "./ColumnContainer.tsx";
 import { DndContext, DragOverlay, PointerSensor, useSensor, useSensors, type DragEndEvent, type DragStartEvent } from "@dnd-kit/core";
 import { arrayMove, SortableContext } from "@dnd-kit/sortable";
 import { createPortal } from "react-dom";
+import TaskCard from "./TaskCard.tsx";
 
 
 const KanbanBoard = () => {
@@ -28,6 +29,8 @@ const KanbanBoard = () => {
   // Tasks States
   const [tasks, setTasks] = useState<Task[]>([]);
   const [tasksCount, setTasksCount] = useState(0);
+
+  const [activeTask, setActiveTask] = useState<Task | null>(null)
 
 
   return (
@@ -66,13 +69,20 @@ const KanbanBoard = () => {
 
         {createPortal(
           <DragOverlay>
-            {activeColumn && <ColumnContainer column={activeColumn} 
+            {activeColumn && (<ColumnContainer column={activeColumn} 
             deleteColumn={deleteColumn} 
             updateColumnTitle={updateColumnTitle}
             createTask={createTask}
             deleteTask={deleteTask}
             updateTask={updateTask}
-            tasks={tasks.filter((task) => task.columnId === activeColumn.id)}/>}
+            tasks={tasks.filter((task) => task.columnId === activeColumn.id)}
+            />)}
+
+            {
+              activeTask && <TaskCard task={activeTask}
+              deleteTask={deleteTask}
+              updateTask={updateTask}/>
+            }
           </DragOverlay>, 
           document.body
         )}
@@ -109,9 +119,13 @@ const KanbanBoard = () => {
   }
 
   function onDragStart(event: DragStartEvent) {
-    console.log("DRAGE START", event);
     if(event.active.data.current?.type === "Column") {
       setActiveColumn(event.active.data.current.column);
+      return;
+    }
+
+    if(event.active.data.current?.type === "Task") {
+      setActiveTask(event.active.data.current.task);
       return;
     }
   }

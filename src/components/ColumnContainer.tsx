@@ -1,8 +1,8 @@
-import React, { useState } from 'react'
+import React, { useMemo, useState } from 'react'
 import type { Column, Id, Task } from '../types';
 import TrashIcon from '../icons/TrashIcon';
-import { useSortable } from '@dnd-kit/sortable';
-import {CSS} from '@dnd-kit/utilities'
+import { SortableContext, useSortable } from '@dnd-kit/sortable';
+import {CSS} from '@dnd-kit/utilities';
 import PlusIcon from '../icons/PlusIcon';
 import TaskCard from './TaskCard';
 
@@ -22,6 +22,11 @@ const ColumnContainer = (props: Props) => {
 
   const [editMode, setEditMode] = useState(false);
 
+  const tasksIds = useMemo(() => {
+    return tasks.map(task => task.id)
+  }, [tasks])
+
+  // Drag & Drop Columns
   const {setNodeRef, attributes, listeners, transform, transition, isDragging} = 
   useSortable({
     id: column.id,
@@ -123,11 +128,13 @@ const ColumnContainer = (props: Props) => {
         className='flex grow flex-col gap-4 p-2
         overflow-x-hidden overflow-y-auto'
       >
-        {tasks.map((task) => (
-          <TaskCard key={task.id} task={task}
-          deleteTask={deleteTask}
-          updateTask={updateTask}/>
-        ))}
+        <SortableContext items={tasksIds}>
+          {tasks.map((task) => (
+            <TaskCard key={task.id} task={task}
+            deleteTask={deleteTask}
+            updateTask={updateTask}/>
+          ))}
+        </SortableContext>
       </div>
 
       {/* Column Footer */}
