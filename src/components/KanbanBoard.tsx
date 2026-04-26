@@ -8,13 +8,13 @@ import { createPortal } from "react-dom";
 
 
 const KanbanBoard = () => {
+  // Columns States
   const [columns, setColumns] = useState<Column[]>([]);
   console.log(columns);
   const [columnsCount, setColumnsCount] = useState(0);
   const columnsId = useMemo(() => columns.map((column) => column.id), [columns])
 
-  const [tasks, setTasks] = useState<Task[]>([]);
-
+  // Columns States
   const [activeColumn, setActiveColumn] = useState<Column | null>(null)
 
   const sensors = useSensors(useSensor(PointerSensor, {
@@ -23,6 +23,12 @@ const KanbanBoard = () => {
 
     }
   }))
+
+
+  // Tasks States
+  const [tasks, setTasks] = useState<Task[]>([]);
+  const [tasksCount, setTasksCount] = useState(0);
+
 
   return (
     <div className="m-auto flex min-h-screen w-full items-center overflow-x-auto overflow-y-hidden px-10">
@@ -33,6 +39,7 @@ const KanbanBoard = () => {
               {columns.map((column) => (
                 <ColumnContainer key={column.id} column={column} updateColumnTitle={updateColumnTitle} deleteColumn={deleteColumn} 
                 createTask={createTask}
+                deleteTask={deleteTask}
                 tasks={tasks.filter((task) => task.columnId === column.id)}/>
               ))}
             </SortableContext>
@@ -62,7 +69,8 @@ const KanbanBoard = () => {
             deleteColumn={deleteColumn} 
             updateColumnTitle={updateColumnTitle}
             createTask={createTask}
-            tasks={tasks}/>}
+            deleteTask={deleteTask}
+            tasks={tasks.filter((task) => task.columnId === activeColumn.id)}/>}
           </DragOverlay>, 
           document.body
         )}
@@ -129,13 +137,21 @@ const KanbanBoard = () => {
   }
 
   function createTask(columnId:Id){
+    const nextTask = tasksCount + 1;
+
     const newTask:Task = {
       id:generateId(),
       columnId,
-      content: `Task ${tasks.length + 1}`
+      content: `Task ${nextTask}`
     }
 
-    setTasks([...tasks, newTask])
+    setTasks([...tasks, newTask]);
+    setTasksCount(nextTask);
+  }
+
+  function deleteTask(id: Id) {
+    const newTasks = tasks.filter((task) => task.id !== id);
+    setTasks(newTasks);
   }
 };
 
