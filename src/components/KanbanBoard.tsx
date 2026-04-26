@@ -1,17 +1,19 @@
 import { useState } from "react";
 import PlusIcon from "../icons/PlusIcon.tsx";
-import type { Column } from "../types";
+import type { Column, Id } from "../types";
+import ColumnContainer from "./ColumnContainer.tsx";
 
 const KanbanBoard = () => {
   const [columns, setColumns] = useState<Column[]>([]);
   console.log(columns);
+  const [columnsCount, setColumnsCount] = useState(0);
 
   return (
     <div className="m-auto flex min-h-screen w-full items-center overflow-x-auto overflow-y-hidden px-10">
       <div className="m-auto flex gap-4">
         <div className="flex gap-4">
           {columns.map((column) => (
-            <div>{column.title}</div>
+            <ColumnContainer column={column} deleteColumn={deleteColumn} key={column.id} />
           ))}
         </div>
 
@@ -36,12 +38,20 @@ const KanbanBoard = () => {
   );
 
   function createNewColumn() {
+    const nextNumber = columnsCount + 1;
+
     const columnToAdd: Column = {
       id: generateId(),
-      title: `Column ${columns.length + 1}`,
+      title: `Column ${nextNumber}`,
     };
 
     setColumns([...columns, columnToAdd]);
+    setColumnsCount(nextNumber);
+  }
+
+  function deleteColumn(id:Id) {
+    const filteredColumns = columns.filter((column) => (column.id !== id))
+    setColumns(filteredColumns);
   }
 };
 
