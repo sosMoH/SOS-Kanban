@@ -5,6 +5,7 @@ import { SortableContext, useSortable } from '@dnd-kit/sortable';
 import {CSS} from '@dnd-kit/utilities';
 import PlusIcon from '../icons/PlusIcon';
 import TaskCard from './TaskCard';
+import RightArrow from '../icons/RightArrow';
 
 interface Props {
   column: Column;
@@ -90,8 +91,8 @@ const ColumnContainer = (props: Props) => {
         border-6
         flex items-center justify-between'
       >
-        <div className='flex gap-2'>
-          <div className='flex justify-center items-center bg-columnBackgroundColor px-2 py-1 text-sm rounded-full'>0</div>
+        <div className='flex gap-2 items-center'>
+          <div className='flex justify-center items-center bg-columnBackgroundColor px-2 py-1 text-sm rounded-full'><RightArrow /></div>
           {!editMode 
             ? column.title
             : <input
