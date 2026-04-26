@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import PlusIcon from "../icons/PlusIcon.tsx";
-import type { Column, Id } from "../types";
+import type { Column, Id, Task } from "../types";
 import ColumnContainer from "./ColumnContainer.tsx";
 import { DndContext, DragOverlay, PointerSensor, useSensor, useSensors, type DragEndEvent, type DragStartEvent } from "@dnd-kit/core";
 import { arrayMove, SortableContext } from "@dnd-kit/sortable";
@@ -10,10 +10,10 @@ import { createPortal } from "react-dom";
 const KanbanBoard = () => {
   const [columns, setColumns] = useState<Column[]>([]);
   console.log(columns);
-
   const [columnsCount, setColumnsCount] = useState(0);
-
   const columnsId = useMemo(() => columns.map((column) => column.id), [columns])
+
+  const [tasks, setTasks] = useState<Task[]>([]);
 
   const [activeColumn, setActiveColumn] = useState<Column | null>(null)
 
@@ -31,7 +31,9 @@ const KanbanBoard = () => {
           <div className="flex gap-4">
             <SortableContext items={columnsId}>
               {columns.map((column) => (
-                <ColumnContainer column={column} updateColumnTitle={updateColumnTitle} deleteColumn={deleteColumn} key={column.id} />
+                <ColumnContainer key={column.id} column={column} updateColumnTitle={updateColumnTitle} deleteColumn={deleteColumn} 
+                createTask={createTask}
+                tasks={tasks.filter((task) => task.columnId === column.id)}/>
               ))}
             </SortableContext>
           </div>
@@ -56,7 +58,11 @@ const KanbanBoard = () => {
 
         {createPortal(
           <DragOverlay>
-            {activeColumn && <ColumnContainer column={activeColumn} deleteColumn={deleteColumn} updateColumnTitle={updateColumnTitle} />}
+            {activeColumn && <ColumnContainer column={activeColumn} 
+            deleteColumn={deleteColumn} 
+            updateColumnTitle={updateColumnTitle}
+            createTask={createTask}
+            tasks={tasks}/>}
           </DragOverlay>, 
           document.body
         )}
@@ -120,6 +126,16 @@ const KanbanBoard = () => {
 
       return arrayMove(columns, activeColumnIndex, overColumnIndex);
     })
+  }
+
+  function createTask(columnId:Id){
+    const newTask:Task = {
+      id:generateId(),
+      columnId,
+      content: `Task ${tasks.length + 1}`
+    }
+
+    setTasks([...tasks, newTask])
   }
 };
 
