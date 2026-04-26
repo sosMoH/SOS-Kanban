@@ -1,1 +1,19 @@
 @import "tailwindcss";
+
+@theme {
+  /* Adds a single specific color */
+  --color-mainBackgroundColor: #0D1117;
+  --color-columnBackgroundColor: #161C22;
+
+  /* You can also add a color scale (like Tailwind's built-in colors) */
+  --color-neon-500: #00ffcc;
+  --color-neon-600: #00ccaa;
+}
+
+html,
+body,
+#root {
+  @apply bg-black;
+  @apply text-white;
+  @apply box-border;
+}
