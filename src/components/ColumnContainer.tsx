@@ -13,11 +13,12 @@ interface Props {
 
   createTask: (columnId:Id) => void;
   deleteTask: (id: Id) => void;
+  updateTask: (id:Id, content:string) => void;
   tasks: Task[];
 }
 
 const ColumnContainer = (props: Props) => {
-  const {column, deleteColumn, updateColumnTitle, createTask, deleteTask, tasks} = props;
+  const {column, deleteColumn, updateColumnTitle, createTask, deleteTask, updateTask, tasks} = props;
 
   const [editMode, setEditMode] = useState(false);
 
@@ -123,7 +124,9 @@ const ColumnContainer = (props: Props) => {
         overflow-x-hidden overflow-y-auto'
       >
         {tasks.map((task) => (
-          <TaskCard key={task.id} task={task} deleteTask={deleteTask} />
+          <TaskCard key={task.id} task={task}
+          deleteTask={deleteTask}
+          updateTask={updateTask}/>
         ))}
       </div>
 
